@@ -24,4 +24,3 @@ class MatchPlayerResults(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     team = models.IntegerField()
     race = models.CharField(max_length=10)
-    duration = models.IntegerField()

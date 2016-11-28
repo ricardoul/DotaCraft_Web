@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from api.models import Match
+from api.models import Match, Player
 
 
 class PlayerSerializer(serializers.ModelSerializer):
+
     class Meta:
-        model = Match
-        fields = ('steam_id', 'team', 'race', 'duration', 'players')
+        model = Player
+        fields = ('steam_id', )
 
 
 class MatchSerializer(serializers.ModelSerializer):
@@ -14,5 +15,3 @@ class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
         fields = ('map', 'winner', 'date', 'duration', 'players')
-
-

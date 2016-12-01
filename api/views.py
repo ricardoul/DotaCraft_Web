@@ -11,8 +11,8 @@ def match_list(request):
     List all matches, or create a new match.
     """
     if request.method == 'GET':
-        snippets = Match.objects.all()
-        serializer = MatchSerializer(snippets, many=True)
+        matches = Match.objects.all()
+        serializer = MatchSerializer(matches, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
@@ -44,8 +44,8 @@ def player_list(request):
     List all players
     """
     if request.method == 'GET':
-        snippets = Player.objects.all()
-        serializer = PlayerSerializer(snippets, many=True)
+        players = Player.objects.all()
+        serializer = PlayerSerializer(players, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':

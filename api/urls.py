@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^matches/(?P<pk>[0-9]+)$', views.match_detail),
     url(r'^players/?$', views.player_list),
     url(r'^players/(?P<pk>[0-9]+)$', views.player_detail),
-
+    url(r'^players/create/$', views.create_player)
     #ladder
 ]
 

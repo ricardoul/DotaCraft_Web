@@ -1,8 +1,26 @@
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from api.models import Match, Player
+from api.models import Match, Player, MatchPlayerResults
 from api.serializers import MatchSerializer, PlayerSerializer
+from datetime import datetime
+
+@api_view(['POST'])
+def create_player(request):
+    """
+    Creates a player
+    """
+    if request.method == 'POST':
+        # Player.objects.update_or_create(pk=request.data['steam_id'], defaults=request.data)
+        # return HttpResponse("Yaay!")
+        serializer = PlayerSerializer(data=request.data, validators=[])
+        serializer.validators = []
+        a = serializer.is_valid()
+        if a:
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'POST'])
@@ -16,11 +34,22 @@ def match_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = MatchSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        match_data = request.data
+        results = match_data.pop('players')
+        match = Match.objects.create(**match_data)
+        for result in results:
+            player, created = Player.objects.get_or_create(steam_id=result['player'])
+            result_o = MatchPlayerResults.objects.create(player=player, match=match,
+                                                        team=result['team'], race=result['race'])
+            print result_o
+        print match
+        match.save()
+        return Response({"Created"}, status=status.HTTP_201_CREATED)
+        #serializer = MatchSerializer(data=request.data)
+        #if serializer.is_valid():
+        #    serializer.save()
+        #    return Response(serializer.data, status=status.HTTP_201_CREATED)
+        #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])

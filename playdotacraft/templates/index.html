@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DotaCraft</title>
+</head>
+<body>
+
+<table class="table" id="matchTable">
+                            <thead>
+                                <tr>
+                                    <th>Matches</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matchTableBody">
+                                {% for match in object_list %}
+                                    <td>{{ match.id }} -- {{ match.map }}</td>
+                                {% endfor %}
+                            </tbody>
+</table>
+</body>
+</html>

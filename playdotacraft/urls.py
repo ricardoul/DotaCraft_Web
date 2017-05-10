@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from . import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('api.urls')),
+    url(r'^matches/$', views.MatchListView.as_view(), name='match_list'),
+    url(r'^players/$', views.PlayerListView.as_view(), name='player_list'),
+    url(r'^matches/details/(?P<pk>[0-9]+)$', views.MatchDetailView.as_view(), name='match_detail'),
 ]

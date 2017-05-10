@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DotaCraft</title>
+</head>
+<body>
+<p>Match ID: {{ object.id }}</p>
+<p>Map: {{ object.map }}</p>
+<p>Winning team: {{ object.winner }}</p>
+<p>Date: {{ object.date }}</p>
+<p>Duration: {{ object.duration }}</p>
+<p>Players: </p>
+    {% for result in results %}
+        <p>Player: {{ result.player.steam_id }}</p>
+        <p>Team: {{ result.team }}</p>
+        <p>Race: {{ result.race }}</p>
+    {% endfor %}
+</body>
+</html>

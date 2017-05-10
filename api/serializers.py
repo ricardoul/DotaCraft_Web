@@ -1,37 +1,61 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from api.models import Match, Player, MatchPlayerResults
-from datetime import datetime
 
 
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ['steam_id']
+        extra_kwargs = {
+            'player': {
+                'validators': [UniqueValidator(queryset=Player.objects.all())],
+            }
+        }
+
+    def validate(self, data):
+        print "validate player", data
+        return data
+
+    def create(self, validated_data):
+        print validated_data
+        player_id = validated_data.pop('steam_id')
+        player, created = Player.objects.get_or_create(steam_id=player_id)
+        return player
+
+    def update(self, instance, validated_data):
+        print validated_data
+        player_id = validated_data.pop('steam_id')
+        player = Player.objects.get_or_create(steam_id=player_id)
+        return player
 
 
 class ResultsSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer(many=False, read_only=False)
+
     class Meta:
         model = MatchPlayerResults
-        fields = ('player', 'team', 'race')
+        fields = ('team', 'race', 'player')
 
-
-class MatchSerializer(serializers.ModelSerializer):
-    players = ResultsSerializer(many=True)
-
-    class Meta:
-        model = Match
-        fields = ('map', 'winner', 'date', 'duration', 'players')
+    def validate(self, data):
+        print "validate result", data
+        return data
 
     def create(self, validated_data):
-        map = validated_data.pop('map')
-        winner = validated_data.pop('winner')
-        duration = validated_data.pop('duration')
-        date = datetime.now().time()
-        match = Match.objects.create(map=map, winner=winner, duration=duration, date=date)
+        print validated_data
+        player_id = validated_data.pop('steam_id')
+        player, created = Player.objects.get_or_create(steam_id=player_id)
+        return player
 
-        results = validated_data.pop('players')
-        for result in results:
-            player = Player.objects.get_or_create(name=result['player'])
-            result = ResultsSerializer(result)
-            match.players.add(player)
+
+class MatchSerializer(serializers.Serializer):
+
+    def create(self, validated_data):
+        #players = validated_data.pop('players')
+        match = Match.objects.create(**validated_data)
+
         return match
+
+    def validate(self, data):
+        print "validate match", data
+        return data

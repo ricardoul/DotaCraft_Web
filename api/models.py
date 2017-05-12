@@ -1,35 +1,47 @@
 from django.db import models
 from django.db.models import Count
 from django.db.models import F
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Player(models.Model):
     steam_id = models.IntegerField(primary_key=True)
+    wins = models.IntegerField(default=0)
+    matches = models.IntegerField(default=0)
+    solo_wins = models.IntegerField(default=0)
+    solo_matches = models.IntegerField(default=0)
 
     def __unicode__(self):
         return 'Player {}'.format(self.steam_id)
 
     def get_matches(self):
-        return MatchPlayerResults.objects.filter(player=self)
+        return MatchPlayerResults.objects.filter(player=self).select_related().order_by('-match__date')
 
     def get_solo_matches(self):
         solo_pks = [o.pk for o in self.get_matches() if o.is_solo()]
-        return MatchPlayerResults.objects.filter(pk__in=solo_pks)
+        return MatchPlayerResults.objects.filter(pk__in=solo_pks).select_related().order_by('-match__date')
 
-    def wins(self):
+    def winrate(self):
+        if self.matches == 0:
+            return "{0:.2f}".format(round(0, 2))
+        rate = (self.wins*1.0/self.matches*1.0)*100.0
+        return "{0:.2f}".format(round(rate, 2))
+
+    def c_wins(self):
         return self.get_matches().filter(match__winner=F('team')).count()
 
     def c_matches(self):
         return self.get_matches().count()
 
-    def winrate(self):
+    def f_winrate(self):
         if self.c_matches() == 0:
             return "{0:.2f}".format(round(0, 2))
-        rate = (self.wins()*1.0/self.c_matches()*1.0)*100.0
-        return "{0:.2f}".format(round(rate, 2)) #cast to float somehow
+        rate = (self.c_wins()*1.0/self.c_matches()*1.0)*100.0
+        return "{0:.2f}".format(round(rate, 2))
 
     def favorite_race(self):
-        if self.c_matches() == 0:
+        if self.matches == 0:
             return 'none'
         fav = self.get_matches().values('race').annotate(count=Count('race')).latest('count')
         return fav['race']
@@ -43,20 +55,26 @@ class Player(models.Model):
     def c_solo_matches(self):
         return self.get_solo_matches().count()
 
-    def solo_wins(self):
+    def c_solo_wins(self):
         return self.get_solo_matches().filter(match__winner=F('team')).count()
 
-    def solo_winrate(self):
+    def f_solo_winrate(self):
         if self.c_solo_matches() == 0:
             return "{0:.2f}".format(round(0, 2))
-        rate = (self.solo_wins()*1.0/self.c_solo_matches()*1.0)*100.0
-        return "{0:.2f}".format(round(rate, 2)) #cast to float somehow
+        rate = (self.c_solo_wins()*1.0/self.c_solo_matches()*1.0)*100.0
+        return "{0:.2f}".format(round(rate, 2))
+
+    def solo_winrate(self):
+        if self.solo_matches == 0:
+            return "{0:.2f}".format(round(0, 2))
+        rate = (self.solo_wins*1.0/self.solo_matches*1.0)*100.0
+        return "{0:.2f}".format(round(rate, 2))
 
 
 class Match(models.Model):
     map = models.CharField(max_length=30)
     winner = models.IntegerField()
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
     duration = models.IntegerField()
     players = models.ManyToManyField(Player, through='MatchPlayerResults')
 

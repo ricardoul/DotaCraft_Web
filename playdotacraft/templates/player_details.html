@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Steam ID: {{ player.steam_id }}</h1>
+<p>Overall Matches: {{ player.c_matches }}</p>
+<p>Overall Winrate: {{ player.winrate }}%</p>
+<p>Solo Matches: {{ player.c_solo_matches }}</p>
+<p>Solo Winrate: {{ player.solo_winrate }}%</p>
+<p>Favorite Race: {{ player.favorite_race }}</p>
+<h1>Latest Matches: </h1>
+    <table class="table" id="allMatchesTable">
+    <thead>
+    <tr>
+        <th>Match ID</th>
+        <th>Map</th>
+        <th>Date</th>
+        <th>Duration</th>
+        <th>Players</th>
+        <th>Team</th>
+        <th>Race</th>
+        <th>Outcome</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for match_result in matches %}
+        <tr>
+            <td><a href="/matches/details/{{ match_result.match.id }}">{{ match_result.match.id }}</a></td>
+            <td>{{ match_result.match.map }}</td>
+            <td>{{ match_result.match.date }}</td>
+            <td>{{ match_result.match.duration }}</td>
+            <td>{{ match_result.match.players.count }}</td>
+            <td>{{ match_result.team }}</td>
+            <td>{{ match_result.race }}</td>
+            {% if match_result.match.winner == match_result.team  %}
+                <td style="color: forestgreen">Won Match</td>
+            {% else %}
+                <td style="color: darkred">Lost Match</td>
+            {% endif %}
+
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+<h1>Latest solo Matches</h1>
+    <table class="table" id="soloMatchesTable">
+    <thead>
+    <tr>
+        <th>Match ID</th>
+        <th>Map</th>
+        <th>Date</th>
+        <th>Duration</th>
+        <th>Players</th>
+        <th>Team</th>
+        <th>Race</th>
+        <th>Outcome</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for match_result in solo_matches %}
+        <tr>
+            <td><a href="/matches/details/{{ match_result.match.id }}">{{ match_result.match.id }}</a></td>
+            <td>{{ match_result.match.map }}</td>
+            <td>{{ match_result.match.date }}</td>
+            <td>{{ match_result.match.duration }}</td>
+            <td>{{ match_result.match.players.count }}</td>
+            <td>{{ match_result.team }}</td>
+            <td>{{ match_result.race }}</td>
+            {% if match_result.match.winner == match_result.team %}
+                <td style="color: forestgreen">Won Match</td>
+            {% else %}
+                <td style="color: darkred">Lost Match</td>
+            {% endif %}
+
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#allMatchesTable').DataTable({"order": []});
+        var stable = $('#soloMatchesTable').DataTable({"order": []});
+    });
+</script>
+{% endblock %}

@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>DotaCraft</title>
-</head>
-<body>
-<p>Match ID: {{ object.id }}</p>
+{% extends "base.html" %}
+{% block body %}
+<h1>Match ID: {{ object.id }}</h1>
 <p>Map: {{ object.map }}</p>
 <p>Winning team: {{ object.winner }}</p>
 <p>Date: {{ object.date }}</p>
 <p>Duration: {{ object.duration }}</p>
-<p>Players: </p>
+<h2>Players: </h2>
     {% for result in results %}
-        <p>Player: {{ result.player.steam_id }}</p>
+        <p>Player: <a href="/players/details/{{ result.player.steam_id }}">{{ result.player.steam_id }}</a></p>
         <p>Team: {{ result.team }}</p>
         <p>Race: {{ result.race }}</p>
     {% endfor %}
-</body>
-</html>
+{% endblock %}

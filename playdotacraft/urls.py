@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
+from django.conf import settings
 from django.contrib import admin
 from . import views
 
@@ -23,4 +24,10 @@ urlpatterns = [
     url(r'^matches/$', views.MatchListView.as_view(), name='match_list'),
     url(r'^players/$', views.PlayerListView.as_view(), name='player_list'),
     url(r'^matches/details/(?P<pk>[0-9]+)$', views.MatchDetailView.as_view(), name='match_detail'),
+    url(r'^players/details/(?P<pk>[0-9]+)$', views.PlayerDetailView.as_view(), name='player_detail'),
 ]
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

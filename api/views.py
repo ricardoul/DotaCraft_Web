@@ -27,8 +27,11 @@ def match_list(request):
     """
     if request.method == 'GET':
         matches = Match.objects.all()
-        serializer = MatchSerializer(matches, many=True)
-        return Response(serializer.data)
+        matches_serialized = []
+        for match in matches:
+            serializer = MatchSerializer.read(match)
+            matches_serialized.append(serializer)
+        return Response(matches_serialized)
 
     elif request.method == 'POST':
         match_data = request.data
@@ -55,13 +58,13 @@ def match_detail(request, pk):
     Retrieve a match instance
     """
     try:
-        snippet = Match.objects.get(pk=pk)
+        match = Match.objects.get(pk=pk)
+        serializer = MatchSerializer.read(match)
+        return Response(serializer)
     except Match.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = MatchSerializer(snippet)
-        return Response(serializer.data)
+
 
 
 @api_view(['GET', 'POST'])

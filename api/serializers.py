@@ -48,12 +48,29 @@ class ResultsSerializer(serializers.ModelSerializer):
         return player
 
 
+
 class MatchSerializer(serializers.Serializer):
+
+    @staticmethod
+    def read(match):
+        match_json = {}
+        match_json['map'] = match.map
+        match_json['date'] = match.date
+        match_json['duration'] = match.duration
+        match_json['players'] = []
+        for matchplayer in match.matchplayerresults_set.all():
+            result = MatchPlayerResults.objects.get(match=match, player=matchplayer.player)
+            result_json ={}
+            result_json['steam_id'] = result.player.steam_id
+            result_json['race'] = result.race
+            result_json['team'] = result.team
+            match_json['players'].append(result_json)
+        return match_json
+
 
     def create(self, validated_data):
         #players = validated_data.pop('players')
         match = Match.objects.create(**validated_data)
-
         return match
 
     def validate(self, data):

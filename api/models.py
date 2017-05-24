@@ -12,15 +12,20 @@ class Player(models.Model):
     solo_wins = models.IntegerField(default=0)
     solo_matches = models.IntegerField(default=0)
 
+
     def __unicode__(self):
         return 'Player {}'.format(self.steam_id)
 
-    def get_matches(self):
-        return MatchPlayerResults.objects.filter(player=self).select_related().order_by('-match__date')
+    def get_matches(self, **kwargs):
+        return MatchPlayerResults.objects.filter(player=self, **kwargs).select_related().order_by('-match__date')
 
     def get_solo_matches(self):
         solo_pks = [o.pk for o in self.get_matches() if o.is_solo()]
         return MatchPlayerResults.objects.filter(pk__in=solo_pks).select_related().order_by('-match__date')
+
+    def get_race_matches(self,race):
+        return MatchPlayerResults.objects.filter(player=self, race=race).select_related().order_by('-match_date')
+
 
     def winrate(self):
         if self.matches == 0:
@@ -33,6 +38,18 @@ class Player(models.Model):
 
     def c_matches(self):
         return self.get_matches().count()
+
+    def c_matches_race(self, race):
+       return self.get_race_matches(race).count()
+
+    def c_wins_race(self,race):
+        return self.get_race_matches(race).filter(match__winner=F('team')).count()
+
+    def f_race_winrate(self,race):
+        if self.c_matches_race(race) == 0:
+            return "{0:.2f}".format(round(0, 2))
+        rate = (self.c_wins_race(race)*1.0/self.c_matches_race(race)*1.0)*100.0
+        return "{0:.2f}".format(round(rate, 2))
 
     def f_winrate(self):
         if self.c_matches() == 0:
@@ -103,3 +120,4 @@ class MatchPlayerResults(models.Model):
 
     def is_solo(self):
         return MatchPlayerResults.objects.filter(match=self.match, team=self.team).count() == 1
+

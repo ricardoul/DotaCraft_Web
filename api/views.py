@@ -1,3 +1,5 @@
+import json
+
 from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -65,6 +67,15 @@ def match_detail(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['GET'])
+def player_race_list(request, race):
+    players = []
+    for player in Player.objects.all():
+
+        #json.dumps(({"steam_id": player.steam_id, "wins": player.c_wins_race(race), "winrate": player.f_race_winrate(race)}))
+        players.append([player.steam_id, player.c_wins_race(race), player.f_race_winrate(race)])
+    return Response(players)
+
 
 
 @api_view(['GET', 'POST'])
@@ -73,6 +84,7 @@ def player_list(request):
     List all players
     """
     if request.method == 'GET':
+
         players = Player.objects.all()
         serializer = PlayerSerializer(players, many=True)
         return Response(serializer.data)

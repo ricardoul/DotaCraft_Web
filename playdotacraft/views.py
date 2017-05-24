@@ -28,6 +28,7 @@ class PlayerListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PlayerListView, self).get_context_data(**kwargs)
+        context["races"] = set(MatchPlayerResults.objects.all().values_list('race', flat=True))
         return context
 
     def get_template_names(self):

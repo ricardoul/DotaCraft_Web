@@ -71,9 +71,8 @@ def match_detail(request, pk):
 def player_race_list(request, race):
     players = []
     for player in Player.objects.all():
-
-        #json.dumps(({"steam_id": player.steam_id, "wins": player.c_wins_race(race), "winrate": player.f_race_winrate(race)}))
-        players.append([player.steam_id, player.c_wins_race(race), player.f_race_winrate(race)])
+        steam_id_link = "<a href='/players/details/{}'>Player {}</a>".format(player.steam_id, player.steam_id)
+        players.append([steam_id_link, player.c_wins_race(race), player.f_race_winrate(race)])
     return Response(players)
 
 

@@ -7,16 +7,16 @@
 <body>
 
 <table class="table" id="matchTable">
-                            <thead>
-                                <tr>
-                                    <th>Matches</th>
-                                </tr>
-                            </thead>
-                            <tbody id="matchTableBody">
-                                {% for match in object_list %}
-                                    <td>{{ match.id }} -- {{ match.map }}</td>
-                                {% endfor %}
-                            </tbody>
+        <thead>
+            <tr>
+                <td>Matches</td>
+            </tr>
+        </thead>
+        <tbody id="matchTableBody">
+            {% for match in object_list %}
+                <td>{{ match.id }} -- {{ match.map }}</td>
+            {% endfor %}
+        </tbody>
 </table>
 </body>
 </html>
